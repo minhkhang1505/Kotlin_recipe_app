@@ -1,6 +1,8 @@
 package com.example.my_recipe_app
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,7 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun RecipeScreen (modifier: Modifier = Modifier) {
+fun RecipeScreen ( navigationToCategoryItemDetailScreen: (Category) -> Unit ) {
+    val modifier : Modifier = Modifier
     val recipeViewModel : MainViewModel = viewModel()
     val viewState by recipeViewModel.categoriesState
 
@@ -35,25 +38,37 @@ fun RecipeScreen (modifier: Modifier = Modifier) {
             viewState.error != null -> {
                 Text(text = "Error Occurred")
             } else -> {
-                CategoryScreen(categories = viewState.list)
+                CategoryScreen(navigationToCategoryItemDetailScreen, categories = viewState.list)
             }
         }
     }
 }
 
 @Composable
-fun CategoryScreen (categories: List<Category>) {
-    LazyVerticalGrid(GridCells.Fixed(2), modifier = Modifier.fillMaxSize()) {
+fun CategoryScreen (navigationToCategoryItemDetailScreen: (Category) -> Unit, categories: List<Category>) {
+    LazyVerticalGrid(
+        GridCells.Fixed(2),
+        modifier = Modifier.fillMaxSize()
+
+    ) {
         items(categories) {
-            category -> CategoryItem(category = category)
+                category -> CategoryItem(category = category, onClick = {
+            try {
+                navigationToCategoryItemDetailScreen(category)
+            } catch (e: Exception) {
+                Log.e("NavigationError", "Error navigating to detail screen", e)
+            }
+        })
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: Category) {
+fun CategoryItem(category: Category, onClick: () -> Unit) {
     Column(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
