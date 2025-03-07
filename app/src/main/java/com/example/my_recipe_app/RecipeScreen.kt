@@ -25,10 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun RecipeScreen ( navigationToCategoryItemDetailScreen: (Category) -> Unit ) {
-    val modifier : Modifier = Modifier
-    val recipeViewModel : MainViewModel = viewModel()
-    val viewState by recipeViewModel.categoriesState
+fun RecipeScreen ( modifier: Modifier = Modifier,
+                   navigateToDetailScreen: (Category) -> Unit,
+                   viewState: MainViewModel.RecipeState,
+                   ) {
 
     Box(modifier = Modifier.fillMaxSize()){
 
@@ -38,37 +38,31 @@ fun RecipeScreen ( navigationToCategoryItemDetailScreen: (Category) -> Unit ) {
             viewState.error != null -> {
                 Text(text = "Error Occurred")
             } else -> {
-                CategoryScreen(navigationToCategoryItemDetailScreen, categories = viewState.list)
+                CategoryScreen(categories = viewState.list, navigateToDetailScreen)
             }
         }
     }
 }
 
 @Composable
-fun CategoryScreen (navigationToCategoryItemDetailScreen: (Category) -> Unit, categories: List<Category>) {
+fun CategoryScreen (categories: List<Category>, navigateToDetailScreen: (Category) -> Unit) {
     LazyVerticalGrid(
         GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
 
     ) {
         items(categories) {
-                category -> CategoryItem(category = category, onClick = {
-            try {
-                navigationToCategoryItemDetailScreen(category)
-            } catch (e: Exception) {
-                Log.e("NavigationError", "Error navigating to detail screen", e)
-            }
-        })
+                category -> CategoryItem(category = category, navigateToDetailScreen)
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: Category, onClick: () -> Unit) {
+fun CategoryItem(category: Category, navigateToDetailScreen: (Category) -> Unit) {
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .clickable { onClick() },
+            .clickable { navigateToDetailScreen(category) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(

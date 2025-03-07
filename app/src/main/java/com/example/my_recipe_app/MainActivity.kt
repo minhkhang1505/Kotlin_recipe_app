@@ -16,36 +16,37 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
             My_recipe_appTheme {
-                MyApp()
+                RecipeApp(navController)
             }
         }
     }
 }
 
-@Composable
-fun MyApp() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "recipe_screen") {
-        composable(route = "recipe_screen") {
-            RecipeScreen { category ->
-                // Điều hướng và truyền dữ liệu
-                navController.currentBackStackEntry
-                    ?.savedStateHandle
-                    ?.set("category", category)
-                navController.navigate("category_item_detail_screen")
-            }
-        }
-        composable(route = "category_item_detail_screen") {
-            val category = navController.previousBackStackEntry?.savedStateHandle?.get<Category>("category")
-
-            if (category != null) {
-                CategoryItemDetailScreen(category) {
-                    navController.popBackStack()
-                }
-            } else {
-                LaunchedEffect(Unit) { navController.popBackStack() }
-            }
-        }
-    }
-}
+//@Composable
+//fun MyApp() {
+//    val navController = rememberNavController()
+//    NavHost(navController = navController, startDestination = "recipe_screen") {
+//        composable(route = "recipe_screen") {
+//            RecipeScreen { category ->
+//                // Điều hướng và truyền dữ liệu
+//                navController.currentBackStackEntry
+//                    ?.savedStateHandle
+//                    ?.set("category", category)
+//                navController.navigate("category_item_detail_screen")
+//            }
+//        }
+//        composable(route = "category_item_detail_screen") {
+//            val category = navController.previousBackStackEntry?.savedStateHandle?.get<Category>("category")
+//
+//            if (category != null) {
+//                CategoryItemDetailScreen(category) {
+//                    navController.popBackStack()
+//                }
+//            } else {
+//                LaunchedEffect(Unit) { navController.popBackStack() }
+//            }
+//        }
+//    }
+//}
